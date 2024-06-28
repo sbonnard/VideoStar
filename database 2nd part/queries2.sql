@@ -29,3 +29,37 @@ VALUES ('VIEENO', 18), ('VIEENO', 20);
 
 INSERT INTO video_star (id_video, id_star, role)
 VALUES ('VIEENO', 9, 'Réalisateur'), ('VIEENO', 5, 'Compositeur');
+
+-- 2. Créer les requêtes permettant de catégoriser les vidéos suivantes en changeant leur type.
+
+UPDATE video
+SET id_type = 9
+WHERE title = "Lucky Numbers";
+
+UPDATE video
+SET id_type = 6
+WHERE title = "Soldier in the Rain";
+
+UPDATE video
+SET id_type = 6
+WHERE title = "Dead of Night";
+
+UPDATE video
+SET id_type = 4
+WHERE title LIKE "%Rose Tattoo, The%";
+
+-- 3. Afficher le titre des vidéos pour lesquelles il n'existe pas encore d'exemplaires
+
+SELECT title
+FROM video
+    LEFT JOIN copy USING (id_video)
+WHERE id_copy IS NULL;
+
+-- 4. Afficher les vidéos de type New et traitant de la planète Zorbight IX.
+
+SELECT title
+FROM type
+    JOIN video USING (id_type)
+    JOIN video_place USING (id_video)
+    JOIN place USING (id_place)
+WHERE type_doc = 'New' AND place_name = 'Zorbight IX';
