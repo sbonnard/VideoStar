@@ -128,12 +128,37 @@ FROM members
     JOIN rental USING (id_member)
     JOIN copy USING (id_copy)
     JOIN format USING (id_format)
-WHERE firstname = "Catherine" and lastname = "Raleigh"
+WHERE firstname = "Catherine" and lastname = "Raleigh" AND date_end IS NULL;
 GROUP BY id_member;
 
--- b. Créer les requêtes de mise à jour de la base de données correspondant
--- aux retours des vidéos de Catherine Raleigh. (On considère que tous les
--- exemplaires sont rendus en bon état.)
--- c. Catherine Raleigh emprunte la vidéo “Freezer” au format Blu-Ray. Créer les
--- requêtes de mise à jour de la base de données correspondant à cette
--- nouvelle location.
+-- b. Créer les requêtes de mise à jour de la base de données correspondant aux retours des vidéos de Catherine Raleigh. (On considère que tous les exemplaires sont rendus en bon état.)
+
+-- Updating date_end
+UPDATE rental 
+SET date_end = CURDATE()
+WHERE id_member = 68;
+
+--Updating state of copies given back
+UPDATE copy
+SET state = 'L'
+WHERE id_copy = 'MEMORI01' 
+OR id_copy = 'LOOKIN03' 
+OR id_copy = 'ONEHUS01'
+OR id_copy = 'GREATW01';
+
+
+-- c. Catherine Raleigh emprunte la vidéo “Freezer” au format Blu-Ray. Créer les requêtes de mise à jour de la base de données correspondant à cette nouvelle location.
+
+-- Finding the Clu-Ray Copy of “Freezer”
+SELECT * 
+FROM copy
+WHERE id_copy LIKE "FREEZE%" AND id_format = 1;
+
+-- Updating the infos 
+UPDATE rental
+SET date_start = CURDATE()
+WHERE id_copy = 'FREEZE01';
+
+UPDATE copy
+SET state = "E"
+WHERE id_copy = "FREEZE01" AND id_format = 1 AND state = L;
