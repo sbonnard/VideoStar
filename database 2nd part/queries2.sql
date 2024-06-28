@@ -117,9 +117,19 @@ ORDER BY id_video;
 
 -- 10.Catherine Raleigh vient rendre toutes ses vidéos en cours de location.
 
-SELECT * FROM members WHERE firstname = "Catherine" and lastname = "Raleigh";
+SELECT * 
+FROM members 
+WHERE firstname = "Catherine" and lastname = "Raleigh";
 
 -- a. Afficher la somme due par Catherine Raleigh.
+
+SELECT firstname, lastname, SUM(price_day * DATEDIFF(CURDATE(), date_start)) AS total_cost
+FROM members
+    JOIN rental USING (id_member)
+    JOIN copy USING (id_copy)
+    JOIN format USING (id_format)
+WHERE firstname = "Catherine" and lastname = "Raleigh"
+GROUP BY id_member;
 
 -- b. Créer les requêtes de mise à jour de la base de données correspondant
 -- aux retours des vidéos de Catherine Raleigh. (On considère que tous les
