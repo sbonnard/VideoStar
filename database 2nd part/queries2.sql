@@ -220,3 +220,48 @@ WHERE total_videos >= ALL (
 )
 GROUP BY id_video, years
 ORDER BY years;
+
+-- 14.Afficher les adhérents ayant loué moins de vidéos en 2023 qu’en 2022 (en nombre de location).
+
+-- It does not work properly but I can't figure why for now
+SELECT m.id_member, firstname, lastname, COUNT(id_rental) AS total_videos
+FROM members m
+    JOIN rental
+WHERE date_start LIKE "%2023%" AND date_end LIKE "%2023"
+GROUP BY m.id_member
+HAVING total_videos < (
+    SELECT COUNT(id_rental) AS total_videos
+    FROM members
+        JOIN rental
+    WHERE date_start LIKE "%2022%" AND date_end LIKE "%2022"
+    GROUP BY m.id_member
+);
+
+-- 15.Afficher les emails des adhérents qui ont loué uniquement des vidéos en VOD.
+
+-- Not fully working. Does not prevent from other format rents that way
+SELECT id_member, email
+FROM members 
+    JOIN rental USING (id_member)
+    JOIN copy USING (id_copy)
+WHERE id_format = 3
+GROUP BY id_member;
+
+-- 16.Afficher pour chaque type de vidéo, la ou les vidéos les plus louées (en nombre de locations).
+
+-- Only have the best-renter...
+SELECT id_video, title, id_type, type_doc, COUNT(id_video) AS total_videos
+FROM type
+    JOIN video USING (id_type)
+    JOIN copy USING (id_video)
+    JOIN rental USING (id_copy)
+GROUP BY id_video, id_type
+HAVING total_videos >= ALL (
+    SELECT COUNT(id_video) AS total_videos
+    FROM type
+    JOIN video USING (id_type)
+    JOIN copy USING (id_video)
+    JOIN rental USING (id_copy)
+    GROUP BY id_video
+)
+ORDER BY id_video, id_type;
