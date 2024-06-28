@@ -66,10 +66,6 @@ WHERE type_doc = 'New' AND place_name = 'Zorbight IX';
 
 -- 5. Afin de créer l’email de relance aux adhérents, affichez la liste des exemplaires loués depuis plus de 7 jours avec le nom, le prénom, l’email de l’adhérent, le titre et le format de la vidéo.
 
-SELECT * 
-FROM rental
-WHERE date_end IS NULL;
-
 SELECT id_copy, lastname, firstname, email, title, format
 FROM format
     JOIN copy USING (id_format)
@@ -86,3 +82,48 @@ FROM video
     JOIN format USING (id_format)
 GROUP BY id_video, id_format
 ORDER BY id_video, id_format;
+
+-- 7. Afficher les 10 adhérents ayant le plus payé pour de la location de vidéo en 2023.
+
+SELECT firstname, lastname, SUM(price_day * DATEDIFF(date_end, date_start)) AS total_cost
+FROM members
+    JOIN rental USING (id_member)
+    JOIN copy USING (id_copy)
+    JOIN format USING (id_format)
+WHERE date_start LIKE "%2023%" and date_end LIKE "%2023%"
+GROUP BY id_member
+ORDER BY total_cost DESC LIMIT 10;
+
+-- 8. Afficher le nom et le prénom des adhérents ayant loué plusieurs fois une même vidéo. Afficher également le titre des vidéos concernées.
+
+SELECT lastname, firstname, title, COUNT(id_video) AS total_rents
+FROM members
+    JOIN rental USING (id_member)
+    JOIN copy USING (id_copy)
+    JOIN video USING (id_video)
+GROUP BY id_member, id_video
+HAVING total_rents > 1;
+
+-- 9. Afficher les titres de toutes les vidéos pour lesquelles aucun exemplaire physique n'est actuellement disponible à la location.
+
+SELECT title
+FROM rental 
+    LEFT JOIN copy USING (id_copy)
+    LEFT JOIN video USING (id_video)
+    JOIN format USING (id_format)
+WHERE date_end IS NULL AND id_format != 3 AND state = "E" OR state = "P"
+GROUP BY id_video
+ORDER BY id_video;
+
+-- 10.Catherine Raleigh vient rendre toutes ses vidéos en cours de location.
+
+SELECT * FROM members WHERE firstname = "Catherine" and lastname = "Raleigh";
+
+-- a. Afficher la somme due par Catherine Raleigh.
+
+-- b. Créer les requêtes de mise à jour de la base de données correspondant
+-- aux retours des vidéos de Catherine Raleigh. (On considère que tous les
+-- exemplaires sont rendus en bon état.)
+-- c. Catherine Raleigh emprunte la vidéo “Freezer” au format Blu-Ray. Créer les
+-- requêtes de mise à jour de la base de données correspondant à cette
+-- nouvelle location.
