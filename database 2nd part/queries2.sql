@@ -221,6 +221,9 @@ WHERE total_videos >= ALL (
 GROUP BY id_video, years
 ORDER BY years;
 
+
+-- ALL OTHER QUESTIONS UNDER ARE NOT WORKING PROPERLY 
+
 -- 14.Afficher les adhérents ayant loué moins de vidéos en 2023 qu’en 2022 (en nombre de location).
 
 -- It does not work properly but I can't figure why for now
