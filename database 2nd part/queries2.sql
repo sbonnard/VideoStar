@@ -77,3 +77,11 @@ FROM format
     JOIN rental USING (id_copy)
     JOIN members USING (id_member)
 WHERE date_end IS NULL AND CURDATE() - date_start > 7;
+
+-- 6. Afficher pour chaque vidéo le nombre d’exemplaires dans chacun des formats.
+
+SELECT id_video, title, COUNT(id_copy) AS nb_copies, id_format, format
+FROM video
+    JOIN copy USING (id_video)
+    JOIN format USING (id_format)
+GROUP BY id_video, id_format;
