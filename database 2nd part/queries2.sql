@@ -63,3 +63,17 @@ FROM type
     JOIN video_place USING (id_video)
     JOIN place USING (id_place)
 WHERE type_doc = 'New' AND place_name = 'Zorbight IX';
+
+-- 5. Afin de créer l’email de relance aux adhérents, affichez la liste des exemplaires loués depuis plus de 7 jours avec le nom, le prénom, l’email de l’adhérent, le titre et le format de la vidéo.
+
+SELECT * 
+FROM rental
+WHERE date_end IS NULL;
+
+SELECT id_copy, lastname, firstname, email, title, format
+FROM format
+    JOIN copy USING (id_format)
+    JOIN video USING (id_video)
+    JOIN rental USING (id_copy)
+    JOIN members USING (id_member)
+WHERE date_end IS NULL AND CURDATE() - date_start > 7;
