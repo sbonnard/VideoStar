@@ -162,3 +162,39 @@ WHERE id_copy = 'FREEZE01';
 UPDATE copy
 SET state = "E"
 WHERE id_copy = "FREEZE01" AND id_format = 1 AND state = L;
+
+-- 11.Afficher les recettes générées pour chacun des formats de vidéo au cours de l’année 2023.
+
+-- Without VIEW 
+SELECT format, SUM(price_day * DATEDIFF(date_end, date_start)) AS total_revenue
+FROM format
+    JOIN copy USING (id_format)
+    JOIN rental USING (id_copy)
+WHERE date_start LIKE "%2023%" AND date_end LIKE "%2023%"
+GROUP BY id_format;
+
+
+-- OR With a VIEW 
+CREATE VIEW revenue_per_year_per_format AS
+SELECT YEAR(date_start) AS years, format, SUM(price_day * DATEDIFF(date_end, date_start)) AS total_revenue
+FROM format
+    JOIN copy USING (id_format)
+    JOIN rental USING (id_copy)
+WHERE date_start
+GROUP BY id_format, years;
+
+
+
+SELECT format, total_revenue
+FROM revenue_per_year_per_format
+WHERE years = 2023
+GROUP BY format, total_revenue;
+
+-- 12.Afficher pour chaque type le nombre de vidéos disponibles à la location, quel que soit le format.
+
+SELECT id_type, type_doc, COUNT(id_video) AS total_videos
+FROM type
+    JOIN video USING (id_type)
+    JOIN copy USING (id_video)
+WHERE state = "L" OR state = "D"
+GROUP BY id_type;
