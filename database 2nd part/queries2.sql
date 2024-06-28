@@ -198,3 +198,25 @@ FROM type
     JOIN copy USING (id_video)
 WHERE state = "L" OR state = "D"
 GROUP BY id_type;
+
+-- 13.Afficher pour chaque année la ou les vidéos qui ont été les plus louées (en nb de location, quel que soit le format).
+
+CREATE VIEW video_rental_count_per_year AS
+SELECT id_video, title, YEAR(date_start) AS years, COUNT(id_video) AS total_videos
+FROM video
+    JOIN copy USING (id_video)
+    JOIN rental USING (id_copy)
+GROUP BY id_video, years
+ORDER BY id_video, years;
+
+
+
+SELECT years, id_video, title, total_videos
+FROM video_rental_count_per_year v
+WHERE total_videos >= ALL (
+    SELECT total_videos
+    FROM video_rental_count_per_year
+    WHERE years = v.years
+)
+GROUP BY id_video, years
+ORDER BY years;
